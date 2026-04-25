@@ -166,12 +166,13 @@ pub mod token_minter {
 fn compute_fee_lamports(mint_fee_usd: u64, price: u64) -> Result<u64> {
     require!(price > 0, MinterError::OraclePriceZero);
 
-    // TODO(student): convert the USD-denominated mint fee into lamports.
-    // Both `mint_fee_usd` and `price` use 6 decimal places, so the formula is:
-    // fee_lamports = mint_fee_usd * LAMPORTS_PER_SOL / price
-    // Keep the integer math and overflow protection from the production version.
-    let _ = (mint_fee_usd, price);
-    todo!("student task: implement fee conversion");
+    let scaled = mint_fee_usd
+        .checked_mul(LAMPORTS_PER_SOL_U64)
+        .ok_or(MinterError::MathOverflow)?;
+    let fee = scaled
+        .checked_div(price)
+        .ok_or(MinterError::MathOverflow)?;
+    Ok(fee)
 }
 
 #[derive(Accounts)]
