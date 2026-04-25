@@ -1,6 +1,7 @@
 {
   "license": "ISC",
   "type": "module",
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
