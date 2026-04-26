@@ -16,7 +16,7 @@ solana-client = "2.1.13"
 solana-sdk = "2.1.13"
 solana-transaction-status = "2.1.13"
 solana-rpc-client-types = "2.3.13"
-sol_usd_oracle = { package = "sol-usd-oracle", path = "../program-task/programs/sol_usd_oracle", features = ["no-entrypoint"] }
+sol_usd_oracle = { package = "sol-usd-oracle", path = "../program/programs/sol_usd_oracle", features = ["no-entrypoint"] }
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread", "time"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
