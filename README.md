@@ -2,6 +2,23 @@
 
 Учебный мини-лаунчпад на Solana + Anchor: два on-chain контракта (SOL/USD oracle и token minter), Rust backend для обновления цены и прослушки событий, а также Remix фронтенд (папка `frontend/`).
 
+## Devnet
+
+| Что | Адрес |
+|---|---|
+| Oracle Program ID | `HQtxovaUN4EFi9KpSTRNAMmYi8NYaZFPK9mSJQqDpAZM` |
+| Minter Program ID | `DyasXoBLYjZ3nhsAWiTXfeZNLF4biDQ563XhYBGXjrp` |
+| Oracle State PDA  | `5QiZdpxPWLCfJYSdzPxGrKb9UbB7AjkzGt37ripQPz2b` |
+
+### Успешные минты в Devnet Explorer
+
+1. **Cosmic (CSM)** — mint `9sbkMipDwZsYYsA9MFhAQnzAhYzMjRn3BAY7rEAujheh`
+   [tx](https://explorer.solana.com/tx/2nv7WGgaC2nVA18CJTL8xrFWFinLpAKEihb4eAnooJ3EQ16HPQg8pfimPrsMURSavabgwrCFwnYTQQSEu7PQdR2P?cluster=devnet)
+2. **Stellar (STL)** — mint `2WHYFwKAL51e4sjTqWxnW4E4hmgEYcMa8kcp6DfeD1JG`
+   [tx](https://explorer.solana.com/tx/ucHf6thtXuGRoMojbsZYFZhEDLrz1ZNR7YQmkg6M3qmvkMdhAzeWY9GaEF2XWybY5oijVYS4xjbsbdbxA3sZyJp?cluster=devnet)
+3. **NebulaCoin (NBC)** — mint `8NTPfyQPdD5ty6wMr1NTqJE1FC7gv51QMC67uofUa13A`
+   [tx](https://explorer.solana.com/tx/4kCJE3FCGDVs5CVzFqcUZaSTpGuMTAq6Fpw1fTDmnTpRFYB2QxDhm9bELkfkfRCdSrDTahNuwKZz1k9sLAt419h7?cluster=devnet)
+
 ## Структура
 - `program/` — Anchor workspace  
   - `programs/sol_usd_oracle` — хранит цену SOL/USD (decimals = 6)  
@@ -97,3 +114,37 @@
 3. `cd program && node scripts/init-local.js` — скопировать `ORACLE_STATE_PUBKEY` в `backend/.env`
 4. `cd backend && cargo run`
 5. `cd frontend && npm run dev` — открыть в браузере и покликать.
+
+## Минт из CLI (без UI)
+
+Удобно для дымового теста после деплоя. Скрипт `program/scripts/mint-token.js` шлёт `mint_token` от текущего CLI-кошелька:
+
+```bash
+# devnet
+cd program
+RPC_URL=https://api.devnet.solana.com node scripts/mint-token.js "MyToken" "MTK"
+
+# localnet (RPC_URL по умолчанию)
+node scripts/mint-token.js "Local" "LOC"
+```
+
+Скрипт выводит mint pubkey, signature и ссылку в Solana Explorer.
+
+## Что починено
+
+Стартер (первый коммит) содержит `todo!()` в нескольких местах и пару намеренно сломанных тестов. По шагам:
+
+- **`sol_usd_oracle::apply_price_update`** — сохраняет `price` и `last_updated_slot`.
+- **`token_minter::compute_fee_lamports`** — `mint_fee_usd × LAMPORTS_PER_SOL / price` через `checked_mul` / `checked_div`, с маппингом overflow в `MinterError::MathOverflow`.
+- **`backend::to_fixed_6`** — парсит десятичную строку в `u64` с 6 знаками после точки, **truncate** (не round) сверх 6-й цифры. Валидация digit-only для int- и frac-частей.
+- **`backend/Cargo.toml`** — путь до `sol-usd-oracle` исправлен с `../program-task/...` на `../program/...`.
+- **LiteSVM-тесты**: `oracle.litesvm.ts` — ожидаемый `decimals=6` (было 8), `minter.litesvm.ts` — формула fee `FEE_USD × LAMPORTS_PER_SOL / PRICE` (было перевёрнуто).
+- **`backend` unit-test** `to_fixed_6_truncates_fraction_to_six_digits` — ожидаемое значение `1_123_456` (truncate), а не `1_123_457`.
+- **Свои `program_id`** — сгенерированы новые keypair'ы, прошиты в `declare_id!`, `Anchor.toml`, `frontend/app/config.ts`, `backend/.env.example`, тесты и init-скрипты.
+
+## Тулинг
+
+- Solana CLI / Agave **2.2.20** (на 2.1.13 transitive deps Anchor требуют rustc 1.82, а bundled rustc там 1.79; в 2.2.x уже 1.82+).
+- Anchor CLI **0.32.1** (через `avm install 0.32.1`).
+- Rust **1.89.0** (см. `program/rust-toolchain.toml`).
+- Node **18+**, yarn **1.22+** для `program/`, npm для `frontend/`.
