@@ -1,3 +1,4 @@
 test-ledger
 backend/.env
 frontend/pnpm-lock.yaml
+.idea/
