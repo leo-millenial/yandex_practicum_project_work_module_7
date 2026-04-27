@@ -18,6 +18,8 @@
    [tx](https://explorer.solana.com/tx/ucHf6thtXuGRoMojbsZYFZhEDLrz1ZNR7YQmkg6M3qmvkMdhAzeWY9GaEF2XWybY5oijVYS4xjbsbdbxA3sZyJp?cluster=devnet)
 3. **NebulaCoin (NBC)** — mint `8NTPfyQPdD5ty6wMr1NTqJE1FC7gv51QMC67uofUa13A`
    [tx](https://explorer.solana.com/tx/4kCJE3FCGDVs5CVzFqcUZaSTpGuMTAq6Fpw1fTDmnTpRFYB2QxDhm9bELkfkfRCdSrDTahNuwKZz1k9sLAt419h7?cluster=devnet)
+4. **UI-минт через Remix frontend + Backpack** — mint `6uQyX9HnV6EEXBCyLFc2bZWYob26dw67BPq1wRM3rkYm`
+   [tx](https://explorer.solana.com/tx/3kv2qRH2FNwra1JMwJXRDw5sbefBAwAs18EY8iyuvrar7XSzNHztbEknUUvBpyuXJC6NYxP3VWmyFVu5L3NNEqN9?cluster=devnet)
 
 ## Структура
 - `program/` — Anchor workspace  
