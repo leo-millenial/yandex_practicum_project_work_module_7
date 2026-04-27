@@ -2,9 +2,12 @@
 
 .PHONY: install validator validator-metaplex build deploy deploy-devnet deploy-oracle-devnet deploy-minter-devnet init init-devnet deploy-oracle deploy-minter backend backend-devnet frontend kill-frontend test
 
+# bundled npm рядом с node — обходит corepack-shim, который у меня перехватывает npm на pnpm
+NPM := node $(shell node -e "const p=require('path'); console.log(p.join(p.dirname(process.execPath), '..', 'lib/node_modules/npm/bin/npm-cli.js'))")
+
 install:
 	cd program && yarn install
-	cd frontend && npm install
+	cd frontend && $(NPM) install --no-fund --no-audit
 
 # Обычный локальный валидатор (без Metaplex)
 validator:
@@ -59,7 +62,7 @@ kill-frontend:
 	-lsof -ti:7001 | xargs kill 2>/dev/null || true
 
 frontend: kill-frontend
-	cd frontend && npm run dev
+	cd frontend && $(NPM) run dev
 
 test:
 	cd program && yarn run ts-mocha -p ./tsconfig.json -t 1000000 "tests/**/*.ts"
